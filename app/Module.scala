@@ -31,6 +31,8 @@ class Module extends AbstractModule {
 
     bind(classOf[RateLimitService]).to(classOf[RateLimit])
 
+    bind(classOf[ConfigService]).to(classOf[ConfigImpl])
+
   }
 
 }

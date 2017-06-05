@@ -20,10 +20,12 @@ trait RateLimitService {
 
 
 @Singleton
-class RateLimit @Inject()(config: Config) extends RateLimitService {
+class RateLimit @Inject()(config: ConfigImpl) extends RateLimitService {
   val apiKeyMap: TrieMap[String, ApiRequestDetails] = new TrieMap()
   val rateLimitMilliSeconds = 10 * 1000
-  val suspendedTimeLimitInMilliSeconds  = 1 * 60 * 1000
+  val suspendedTimeLimitInMilliSeconds  = 5 * 60 * 1000
+  val defaultMaxNumberOfRequestPerTenSeconds = 10
+
 
   override def checkRateLimit(apiKey: String, apiRequestTime: Calendar) : Boolean = {
     val apiRequestDetails = apiKeyMap.getOrElseUpdate(apiKey, new ApiRequestDetails(apiKey))
@@ -57,7 +59,7 @@ class RateLimit @Inject()(config: Config) extends RateLimitService {
   }
 
   def requestWithinRateLimit(apiRequestDetails: ApiRequestDetails, apiRequestTime: Calendar): Boolean = {
-    val noOfRequest = config.getRequestPerTenSecondsForApiKey(apiRequestDetails.apiKey)
+    val noOfRequest = config.getKeyValueOrDefault(apiRequestDetails.apiKey, defaultMaxNumberOfRequestPerTenSeconds)
 
     if(apiRequestDetails.requestTimeStampInMilliSecondsList.size < noOfRequest)
       return true
