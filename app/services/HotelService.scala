@@ -36,7 +36,7 @@ class Hotel @Inject() (hotelDao : HotelDao) extends HotelService {
     if(sortBy == "ASC")
       (x:HotelDetails, y:HotelDetails) => x.price < y.price
     else if (sortBy == "DESC")
-      (x:HotelDetails, y:HotelDetails) => x.price < y.price
+      (x:HotelDetails, y:HotelDetails) => x.price > y.price
     else
       (x:HotelDetails, y:HotelDetails) => true
   }
