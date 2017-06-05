@@ -11,7 +11,7 @@ import scala.collection.concurrent.TrieMap
 
 @Singleton
 class Config {
-  val defaultMaxNumberOfRequestPerTenSeconds = 10
+  val defaultMaxNumberOfRequestPerTenSeconds = 2
   val keyValueConfig: TrieMap[String, Int] = new TrieMap()
 
   def getRequestPerTenSecondsForApiKey(apiKey : String) : Int = keyValueConfig.getOrElse(apiKey, defaultMaxNumberOfRequestPerTenSeconds)
