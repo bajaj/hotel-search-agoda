@@ -130,24 +130,15 @@ Incase of rate limit execeeded.
 ## Components & Data Structures
 
 - Hotel Service
-    - start the cralwer with the domain name and time to crawl.
-    - when itialization the crawler gets links from SiteMapXmlParser, then push this links to queue and        create instance of UrlCrawlrule for the give domain name
-    - retrieve a url from the queue
-    - checks if the url is not already processed and urlcrawlRule allowes the url
+    - Caches the hotel data returned from the hotel data layer
+    - It used Concurrent Trie map for storing the info. Key been the city name and value is the list of hotels
 
-## Data Structures
-- Page - contains info about a page
-```
-{
-    url: this page url,
-    assets: list of strings
-    children: list of links on this page
-}
-```
+- RateLimit Service
+    - Stores the request details with respect to apikey
+    - for each api key its stores list of request. For storing this it uses concurrent trie hashmap
+    - It also stores the suspended state of the apikey.
 
-- PageRequestQueue - a simple queue containing un-parsed urls. It is backed by hashSet to contain unique urls only
-```
-[url1, url2]
-```
+-   Config service
+    - Stores key value pair. It uses concurrent trie hashmap of the same.
 
 
