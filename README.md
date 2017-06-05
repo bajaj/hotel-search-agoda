@@ -13,7 +13,7 @@ Test for Agoda SDE.
             - To set request limit of apikey. set key to apiKey and value= number of request per 10 seconds
             - parameters: key & value [optional]
             - set the given key to the value 
-            - in case value is not present it returns the value of the key
+            - in case value is not present it returns the current value of the key
 ```bash
 $ sbt run
 ```
