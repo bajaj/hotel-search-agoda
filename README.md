@@ -102,60 +102,38 @@ Incase of rate limit execeeded.
 ## Architecture
 
 ```
-               +--------+                  +-----------------------+
-               | Start  |----------------> | Writer to file/stdout | 
-               +--------+                  +------------------------
-                 ^ ^ | |
-   Pages crawled | | | | Domain & time to crawl
-                 | | v v
-               +---------+                 +----------------+
-          +----| Crawler |<--------------->| Page-extractor |
-          |    |         |                 +----------------+
-          |    |         |<--------------->+----------------+
-          |    |         |                 |SiteMapXmlParser|
-          |    |         |                 +----------------+
-          |    |         |<--------------->+----------------+
-     push |    +---------+                 |  UrlCrawlRule  |                 
-     urls |      ^                         +----------------+ 
-          |      | fetch
-          |      | a url
-          |      |
-          v      |
-      +------------+         
-      | PageRequest|         
-      |   Queue    |
-      +------------+        
-                     
+         
+   Client Request
+        |
+        |
+        v
++------------------------+  Check rate limit   +--------------------+        
+| HotelSearch Controller |-------------------->| RateLimit Service |
++------------------------+                     +--------------------+     
+        |                                               | 
+        | After success rate limit                      | get config for api-key
+        v                                               v
++---------------------+                       +-----------------------+
+| HotelSearch Service |                       |    Config service     |  
++---------------------+                       +-----------------------+
+        |
+        |
+        v
++-----------------------+
+| HotelSearch DataLayer |
+| (reads from csv)      |
++-----------------------+
+
+     
 ```
 
-## Components
+## Components & Data Structures
 
-- Start
+- Hotel Service
     - start the cralwer with the domain name and time to crawl.
-    - when the crawler finishes, print the list of pages.
-- PageRequestQueue
-    - It contains all the urls which are to processed by the crawler.
-    - No duplicate url is present in the queue.
-- PageExtractor
-    - Given a url it fetches the page by making http request.
-    - Using Jsoup (DOM parser) it extracts all the assets and links from the page.
-- SiteMapXmlParser
-    - it process sitemap.xml for the given url and returns list of url available for parsing.
-- UrlCrawlRule
-    - It fetches robots.txt file for the give url and create rules for the same
-    - Each url should satisfy all the rules inorder to be processed by the crawler
-- Crawler
-    - at initialization the crawler gets links from SiteMapXmlParser, then push this links to queue and        create instance of UrlCrawlrule for the give domain name
+    - when itialization the crawler gets links from SiteMapXmlParser, then push this links to queue and        create instance of UrlCrawlrule for the give domain name
     - retrieve a url from the queue
     - checks if the url is not already processed and urlcrawlRule allowes the url
-    - calls pageExtractor module to retrieve the page object (contains assets links and list of links)
-    - add the page to the list of pages (final result)
-    - for all the links in the page,check for the rules and then push to the queue
-    - stop when the queue is empty or the crawler is finish running for the given seconds
-
-## Performance
-- Tested crawler on https://gocardless.com/. It crawled 275 pages in 5 minutes
-- The crawler is single threaded. The time is also spent on waiting for certain pages, timeout being 10secs.
 
 ## Data Structures
 - Page - contains info about a page
